@@ -17,41 +17,48 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   void initState() {
-    final locationProvider = Provider.of<LocationProvider>(context, listen: false);
+    final locationProvider =
+        Provider.of<LocationProvider>(context, listen: false);
     locationProvider.determinePosition().then((_) {
       if (locationProvider.currentLocationName != null) {
         var city = locationProvider.currentLocationName!.locality;
         if (city != null) {
-          Provider.of<WeatherServiceProvider>(context, listen: false).fetchWeatherDataByCity(city.toString());
+          Provider.of<WeatherServiceProvider>(context, listen: false)
+              .fetchWeatherDataByCity(city.toString());
         }
       }
     });
 
     super.initState();
   }
-  TextEditingController _cityController=TextEditingController();
-  bool _clicked = false;
+
+  TextEditingController _cityController = TextEditingController();
+  // bool _clicked = false;
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
 
-    final locationProvider = Provider.of<LocationProvider>(context);
+    // final locationProvider = Provider.of<LocationProvider>(context);
 
     // Get the weather data from the WeatherServiceProvider
     final weatherProvider = Provider.of<WeatherServiceProvider>(context);
 // Inside the build method of your _HomePageState class
 
 // Get the sunrise timestamp from the API response
-    int sunriseTimestamp = weatherProvider.weather?.sys?.sunrise ?? 0; // Replace 0 with a default timestamp if needed
-    int sunsetTimestamp = weatherProvider.weather?.sys?.sunset ?? 0; // Replace 0 with a default timestamp if needed
+    int sunriseTimestamp = weatherProvider.weather?.sys?.sunrise ??
+        0; // Replace 0 with a default timestamp if needed
+    int sunsetTimestamp = weatherProvider.weather?.sys?.sunset ??
+        0; // Replace 0 with a default timestamp if needed
 
 // Convert the timestamp to a DateTime object
-    DateTime sunriseDateTime = DateTime.fromMillisecondsSinceEpoch(sunriseTimestamp * 1000);
-    DateTime sunsetDateTime = DateTime.fromMillisecondsSinceEpoch(sunsetTimestamp * 1000);
+    DateTime sunriseDateTime =
+        DateTime.fromMillisecondsSinceEpoch(sunriseTimestamp * 1000);
+    DateTime sunsetDateTime =
+        DateTime.fromMillisecondsSinceEpoch(sunsetTimestamp * 1000);
 
 // Format the sunrise time as a string
-    String formattedSunrise = DateFormat.Hm().format(sunriseDateTime);
-    String formattedSunset = DateFormat.Hm().format(sunsetDateTime);
+    String formattedSunrise = DateFormat('hh:mm').format(sunriseDateTime);
+    String formattedSunset = DateFormat('hh:mm').format(sunsetDateTime);
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
@@ -62,87 +69,94 @@ class _HomePageState extends State<HomePage> {
         width: size.width,
         decoration: BoxDecoration(
             image: DecorationImage(
-                fit: BoxFit.cover, image: AssetImage( background[weatherProvider.weather?.weather![0]?.main ?? "N/A"] ?? "assets/img/default.png",))),
+                fit: BoxFit.cover,
+                image: AssetImage(
+                  background[weatherProvider.weather?.weather![0]?.main ??
+                          "N/A"] ??
+                      "assets/img/default.png",
+                ))),
         child: Stack(
           children: [
-
             Container(
               height: 50,
               child: Consumer<LocationProvider>(
                   builder: (context, locationProvider, child) {
-                    var locationCity;
-                    if (locationProvider.currentLocationName != null) {
-                      locationCity = locationProvider.currentLocationName!.locality;
-                    } else {
-                      locationCity = "Unknown Location";
-                    }
+                var locationCity;
+                if (locationProvider.currentLocationName != null) {
+                  locationCity = locationProvider.currentLocationName!.locality;
+                } else {
+                  locationCity = "Unknown Location";
+                }
 
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          child: Row(
+                return Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Container(
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.location_pin,
+                            color: Colors.red,
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(
-                                Icons.location_pin,
-                                color: Colors.red,
+                              AppText(
+                                data: locationCity,
+                                color: Colors.black,
+                                fw: FontWeight.w700,
+                                size: 18,
                               ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  AppText(
-                                    data: locationCity,
-                                    color: Colors.white,
-                                    fw: FontWeight.w700,
-                                    size: 18,
-                                  ),
-                                  AppText(
-                                    data: "Good Morning",
-                                    color: Colors.white,
-                                    fw: FontWeight.w400,
-                                    size: 14,
-                                  )
-                                ],
-                              ),
+                              AppText(
+                                data: "Good Morning",
+                                color: Colors.black,
+                                fw: FontWeight.w400,
+                                size: 14,
+                              )
                             ],
                           ),
-                        ),
-
-                      ],
-                    );
-                  }),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }),
             ),
             Align(
-              alignment: Alignment(0, -0.7),
+              alignment: const Alignment(0, -0.7),
               child: Image.asset(
-                imagePath[weatherProvider.weather?.weather![0]?.main ?? "N/A"] ?? "assets/img/default.png",
-                // Adjust the height as needed
-              ),),
+                imagePath[
+                        weatherProvider.weather?.weather![0]?.main ?? "N/A"] ??
+                    "assets/img/default.png",
+              ),
+            ),
             Align(
-              alignment: Alignment(0, 0),
+              alignment: const Alignment(0, 0),
               child: Container(
                 height: 150,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     AppText(
-                      data: "${weatherProvider.weather?.main?.temp?.toStringAsFixed(0)} \u00B0C" ?? "", // Display temperature
+                      data:
+                          "${weatherProvider.weather?.main?.temp?.toStringAsFixed(0)} \u00B0C" ??
+                              "", // Display temperature
                       color: Colors.white,
                       fw: FontWeight.bold,
                       size: 32,
                     ),
                     AppText(
-                      data:weatherProvider.weather?.name ?? "N/A",
+                      data: weatherProvider.weather?.name ?? "N/A",
                       color: Colors.white,
                       fw: FontWeight.w600,
                       size: 20,
                     ),
                     AppText(
-                      data:weatherProvider.weather?.weather![0].main ?? "N/A",
+                      data: weatherProvider.weather?.weather![0].main ?? "N/A",
                       color: Colors.white,
                       fw: FontWeight.w600,
                       size: 20,
@@ -156,7 +170,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Align(
-              alignment: Alignment(0.0, 0.75),
+              alignment: const Alignment(0.0, 0.75),
               child: Container(
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
@@ -185,7 +199,9 @@ class _HomePageState extends State<HomePage> {
                                   fw: FontWeight.w600,
                                 ),
                                 AppText(
-                                  data:"${weatherProvider.weather?.main!.tempMax!.toStringAsFixed(0)} \u00B0C"?? "N/A",
+                                  data:
+                                      "${weatherProvider.weather?.main!.tempMax!.toStringAsFixed(0)} \u00B0C" ??
+                                          "N/A",
                                   color: Colors.white,
                                   size: 14,
                                   fw: FontWeight.w600,
@@ -194,7 +210,7 @@ class _HomePageState extends State<HomePage> {
                             )
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 20,
                         ),
                         Row(
@@ -214,7 +230,9 @@ class _HomePageState extends State<HomePage> {
                                   fw: FontWeight.w600,
                                 ),
                                 AppText(
-                                  data:"${weatherProvider.weather?.main!.tempMin!.toStringAsFixed(0)} \u00B0C"?? "N/A",
+                                  data:
+                                      "${weatherProvider.weather?.main!.tempMin!.toStringAsFixed(0)} \u00B0C" ??
+                                          "N/A",
                                   color: Colors.white,
                                   size: 14,
                                   fw: FontWeight.w600,
@@ -251,7 +269,7 @@ class _HomePageState extends State<HomePage> {
                                   fw: FontWeight.w600,
                                 ),
                                 AppText(
-                                  data:"${formattedSunrise} AM",
+                                  data: "${formattedSunrise} AM",
                                   color: Colors.white,
                                   size: 14,
                                   fw: FontWeight.w600,
@@ -260,7 +278,7 @@ class _HomePageState extends State<HomePage> {
                             )
                           ],
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 20,
                         ),
                         Row(
@@ -280,7 +298,7 @@ class _HomePageState extends State<HomePage> {
                                   fw: FontWeight.w600,
                                 ),
                                 AppText(
-                                  data:"${formattedSunset} PM",
+                                  data: "${formattedSunset} PM",
                                   color: Colors.white,
                                   size: 14,
                                   fw: FontWeight.w600,
@@ -300,26 +318,41 @@ class _HomePageState extends State<HomePage> {
               left: 20,
               right: 20,
               child: Container(
-                height: 45,
+                // height: 45,
                 child: Row(
                   children: [
                     Expanded(
                       child: TextFormField(
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.black),
                         controller: _cityController,
                         decoration: InputDecoration(
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white),
-                          ),
-                          focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.white),
+                          fillColor: Colors.grey.withOpacity(0.5),
+                          contentPadding: const EdgeInsets.only(
+                              top: 0, left: 10, bottom: 4),
+                          filled: true,
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide.none,
                           ),
                         ),
                       ),
                     ),
-                    IconButton(onPressed: (){
-                      Provider.of<WeatherServiceProvider>(context, listen: false).fetchWeatherDataByCity(_cityController.text.toString());
-                    }, icon: Icon(Icons.search))
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Provider.of<WeatherServiceProvider>(context,
+                                listen: false)
+                            .fetchWeatherDataByCity(
+                                _cityController.text.toString());
+                      },
+                      child: Container(
+                        width: 35,
+                        height: 45,
+                        color: const Color.fromARGB(255, 98, 130, 156),
+                        child: const Icon(Icons.search),
+                      ),
+                    )
                   ],
                 ),
               ),
